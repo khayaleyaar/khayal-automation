@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-import os, json, datetime
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+import os
+import json
+import datetime
 
-# Dummy placeholder logic
 print("✅ Generator script started at", datetime.datetime.now())
 
-# YouTube upload stub
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-creds = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
-with open("client_secret.json","w") as f: json.dump(creds, f)
+# Fail fast if the env-var is missing
+raw = os.getenv("GOOGLE_CREDENTIALS")
+if not raw:
+    raise SystemExit("❌  GOOGLE_CREDENTIALS env-var is empty or missing!")
 
-print("✅ Ready for YouTube upload!")
+# Parse and save
+creds = json.loads(raw)
+with open("service_account.json", "w") as f:
+    json.dump(creds, f)
+
+print("✅ service_account.json written")
