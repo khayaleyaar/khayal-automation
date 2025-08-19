@@ -1,0 +1,5 @@
+remotion
+remotion-cli
+opencv-python
+moviepy
+google-api-python-client
