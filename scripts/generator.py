@@ -9,7 +9,7 @@ print("✅ Generator script started at", datetime.datetime.now())
 
 # YouTube upload stub
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-creds = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
+creds = json.loads(os.getenv("GOOGLE_CREDENTIALS_JSON"))
 with open("client_secret.json","w") as f: json.dump(creds, f)
 
 print("✅ Ready for YouTube upload!")
