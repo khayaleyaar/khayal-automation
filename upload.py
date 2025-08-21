@@ -2,7 +2,7 @@ import os
 import json
 import pickle
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
@@ -10,26 +10,25 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 VIDEO_FILE = "sample.mp4"
 
 def get_service():
-    # Load credentials JSON from environment
-    creds_data = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-    creds = None
+    # 1. Load the OAuth client secret JSON from GitHub secret
+    client_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
 
-    # If token.pickle exists in repo root, use it
+    # 2. Load existing token.pickle (refresh-token) if exists
     if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
-            creds = pickle.load(token)
-
-    # Refresh or run console flow
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
+        with open("token.pickle", "rb") as f:
+            token_dict = pickle.load(f)
+        creds = Credentials.from_authorized_user_info(token_dict, SCOPES)
+        if creds.expired:
             creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_config(creds_data, SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
+            # save updated token
+            with open("token.pickle", "wb") as f:
+                pickle.dump(json.loads(creds.to_json()), f)
+        return build("youtube", "v3", credentials=creds)
 
-    return build("youtube", "v3", credentials=creds)
+    # 3. If token.pickle missing → stop with clear message
+    raise RuntimeError(
+        "token.pickle missing! Run local script once to create it, then commit the file."
+    )
 
 def upload():
     if not os.path.exists(VIDEO_FILE):
