@@ -1,27 +1,17 @@
 name: Daily Islamic Short
 on:
   schedule:
-    - cron: "30 22 * * *"   # 03:00 AM IST
+    - cron: "30 3 * * *"    # 9:00 AM IST daily
   workflow_dispatch:
 
 jobs:
-  build:
+  upload:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: pip install -r requirements.txt
-
-      - name: Debug GOOGLE_CREDENTIALS
-        run: |
-          echo "Length: ${#GOOGLE_CREDENTIALS}"
-          echo "First 50 chars: ${GOOGLE_CREDENTIALS:0:50}"
+      - run: pip install google-api-python-client
+      - run: python upload.py
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-      - run: python scripts/generator.py
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-      - run: echo "Ready!"
