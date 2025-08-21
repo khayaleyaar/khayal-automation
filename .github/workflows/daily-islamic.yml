@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: pip install google-api-python-client
+      + run: pip install --force-reinstall --no-cache-dir google-api-python-client google-auth-oauthlib google-auth-httplib2
       - run: python upload.py
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
