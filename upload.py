@@ -42,7 +42,7 @@ def upload():
                 "description": "15-sec auto-upload via GitHub Actions",
                 "tags": ["islamic", "shorts", "automation"]
             },
-            "status": {"privacyStatus": "private"}
+            "status": {"privacyStatus": "public"}
         },
         media_body=MediaFileUpload(VIDEO_FILE, chunksize=-1, resumable=True)
     )
