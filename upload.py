@@ -10,25 +10,21 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 VIDEO_FILE = "sample.mp4"
 
 def get_service():
-    # 1. Load the OAuth client secret JSON from GitHub secret
-    client_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+    import os, json, pickle
+    from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
 
-    # 2. Load existing token.pickle (refresh-token) if exists
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as f:
-            token_dict = pickle.load(f)
-        creds = Credentials.from_authorized_user_info(token_dict, SCOPES)
-        if creds.expired:
-            creds.refresh(Request())
-            # save updated token
-            with open("token.pickle", "wb") as f:
-                pickle.dump(json.loads(creds.to_json()), f)
-        return build("youtube", "v3", credentials=creds)
-
-    # 3. If token.pickle missing → stop with clear message
-    raise RuntimeError(
-        "token.pickle missing! Run local script once to create it, then commit the file."
-    )
+    if not os.path.exists("token.pickle"):
+        raise RuntimeError("token.pickle missing! Create it locally once.")
+    with open("token.pickle", "rb") as f:
+        token = pickle.load(f)
+    creds = Credentials.from_authorized_user_info(token, ["https://www.googleapis.com/auth/youtube.upload"])
+    if creds.expired:
+        creds.refresh(Request())
+        with open("token.pickle", "wb") as f:
+            pickle.dump(json.loads(creds.to_json()), f)
+    return build("youtube", "v3", credentials=creds)
 
 def upload():
     if not os.path.exists(VIDEO_FILE):
