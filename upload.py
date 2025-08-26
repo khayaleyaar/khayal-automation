@@ -10,16 +10,11 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 VIDEO_FILE = "sample.mp4"
 
 def get_service():
-    import os, json, pickle
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials
-    from googleapiclient.discovery import build
-
     if not os.path.exists("token.pickle"):
         raise RuntimeError("token.pickle missing! Create it locally once.")
     with open("token.pickle", "rb") as f:
         token = pickle.load(f)
-    creds = Credentials.from_authorized_user_info(token, ["https://www.googleapis.com/auth/youtube.upload"])
+    creds = Credentials.from_authorized_user_info(token, SCOPES)
     if creds.expired:
         creds.refresh(Request())
         with open("token.pickle", "wb") as f:
